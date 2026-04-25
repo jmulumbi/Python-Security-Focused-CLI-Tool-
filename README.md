@@ -81,13 +81,6 @@ This project is intentionally built alongside my SOC and defensive security work
 - Understanding **how credentials are stored and attacked** makes me a better SOC analyst — I know what brute-force and credential stuffing look like because I've built the defenses from scratch
 - The **lockout and session controls** in Phase 3 reflect the same MITRE ATT&CK techniques (T1110 — Brute Force) I've written detection rules for in Microsoft Sentinel
 
----
-
-## 📄 Resume Framing (Final Goal)
-
-> *"Built a Python-based credential storage system implementing AES-256 encryption, bcrypt password hashing, attempt lockout controls, and structured audit logging — demonstrating applied cryptography and secure coding principles."*
-
----
 
 ## 📬 Connect
 
