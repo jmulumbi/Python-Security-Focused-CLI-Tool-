@@ -3,12 +3,6 @@
 
 ---
 
-## 📌 Project Status: In Progress
-
-This project is intentionally documented as a progression. Each phase represents real skills being built and applied. Check the phase tracker below to see what's done, what's in progress, and what's coming.
-
----
-
 ## 🧠 What This Project Is
 
 A Python-based credential storage and encryption system — think a lightweight version of HashiCorp Vault or a personal password manager — built from the ground up with security as the core design principle.
