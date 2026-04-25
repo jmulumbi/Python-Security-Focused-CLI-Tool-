@@ -50,16 +50,6 @@ The goal is not just to build a working tool, but to demonstrate **how a develop
 
 ---
 
-### 🖥️ Phase 4 — Interface & Portfolio Polish (Planned)
-> *Making it presentable and usable*
-
-- [ ] Clean CLI interface with formatted menus and user feedback
-- [ ] Optional: lightweight web interface (Flask)
-- [ ] README with full setup instructions and usage examples
-- [ ] Documented threat model — what this protects against and what it doesn't
-
----
-
 ## 🛠️ Technologies Used
 
 | Tool | Purpose |
