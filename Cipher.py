@@ -6,11 +6,13 @@
 # 4. Look for options for add on 
 # 5. Create a GUI which deals with the front-end 
 # 6. Database in the future 
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#Import json, os, cryptography, and base64
 import json
 import os
 from cryptography.fernet import Fernet
 import base64
-KEY = '!7*3(%'
+#Function for Luhn algorithm to validate credit card numbers.
 def verify_credit_card(card_translated):
     total = 0 
     reversed_card = card_translated[::-1]
@@ -30,6 +32,7 @@ def verify_credit_card(card_translated):
     print(total)
     return total % 10 == 0
 
+#Main function to run CLI Tool 
 def main():
     print("Welcome To Your Credit Card Storage and Encryption System")
     while True:
@@ -108,7 +111,5 @@ def main():
         else:
             print('Invalid Choicce')
             continue
-            
-
             
 main()
