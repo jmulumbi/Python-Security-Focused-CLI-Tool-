@@ -138,10 +138,56 @@ def main():
             decrypted = f_key.decrypt(token).decode('utf-8')
             print(f'Decoded Card Number: {decrypted}' )
                 
-                
-                
         elif choices == '3':
-            pass
+            file_name = 'cards.json'
+            key_file_name = 'key.json'
+
+            if not os.path.exists(file_name) or not os.path.exists(key_file_name):
+                print(f'There are no available cards')
+                continue
+            with open(file_name) as f:
+                all_data = json.load(f)
+            with open(key_file_name) as x:
+                key_data = json.load(x)
+
+            for i, card in enumerate(all_data):
+                print(f'{i+1}. {card['first_name']} {card['last_name']}')
+
+            try: 
+                pick = int(input('Which card number do you want to remove?: ')) - 1
+                if pick < 0 or pick >= len(all_data):
+                    print('Ivalid Selection')
+            except:
+                print('Enter a number: ')
+                continue
+            pin = input(f'Please enter your pin for the account :')
+            #{card[pick]['first_name']} {card[pick]['last_name']}
+            if pin != all_data[pick]['card_pin']:
+                print('Ivalid Pin')
+                continue
+
+            remove = input('Are you sure you want to remove the card(y/n): ')
+            if remove.lower() == 'y':
+                all_data.pop(pick)
+                key_data.pop(pick)
+
+                with open(file_name,'w') as f:
+                    json.dump(all_data,f,indent=2)
+
+                with open(key_file_name,'w') as x:
+                    json.dump(key_data,x,indent=2)
+                    
+                print('Card Number Removed')
+                print(f'Card Number Removed. The total enttries are {len(all_data)}')
+                print(all_data)
+                print(key_data)
+
+
+
+
+            else:
+                break
+
         elif choices == '4':
             pass
         else:
