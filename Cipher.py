@@ -176,18 +176,13 @@ def main():
 
                 with open(key_file_name,'w') as x:
                     json.dump(key_data,x,indent=2)
-                    
+
                 print('Card Number Removed')
                 print(f'Card Number Removed. The total enttries are {len(all_data)}')
                 print(all_data)
                 print(key_data)
-
-
-
-
             else:
                 break
-
         elif choices == '4':
             pass
         else:
