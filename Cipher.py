@@ -103,7 +103,43 @@ def main():
             else:
                 print('Invalid!')
         elif choices == '2':
-            pass
+            file_name = 'cards.json'
+            key_file_name = 'key.json'
+            if not os.path.exists(file_name) or not os.path.exists(key_file_name):
+                print('No Cards Saved Yet')
+                continue
+            with open(file_name) as f:
+                all_data = json.load(f)
+            with open(key_file_name) as x:
+                key_data = json.load(x)
+            if not all_data:
+                print('No Cards Found')
+                continue
+            print('Saved Cards \n')
+            for i, card in enumerate(all_data):
+                encrypted = base64.b64decode(card['card_number'])
+                print(f'{i+1}. {card['first_name']} {card['last_name']}')
+            try:
+                pick = int(input('Select card number: ')) - 1
+                if pick < 0 or pick >= len(all_data):
+                    print('Invalid Section')
+                    continue
+            except ValueError:
+                print('Enter a number: ')
+                continue
+            pin = input('Enter your pin: ')
+            if pin != all_data[pick]['card_pin']:
+                print('Incorrect Pin')
+                continue
+
+            key = base64.b64decode(key_data[pick]['key'])
+            token = base64.b64decode(all_data[pick]['card_number'])
+            f_key = Fernet(key)
+            decrypted = f_key.decrypt(token).decode('utf-8')
+            print(f'Decoded Card Number: {decrypted}' )
+                
+                
+                
         elif choices == '3':
             pass
         elif choices == '4':
