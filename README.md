@@ -29,7 +29,7 @@ The goal is not just to build a working tool, but to demonstrate **how a develop
 ### 🔄 Phase 2 — Real Cryptography (In Progress)
 > *Replacing toy encryption with industry-standard security*
 
-- [ ] Replace Vigenère cipher with **AES-256 encryption** using Python's `cryptography` library (`Fernet`)
+- [x] Replace Vigenère cipher with **AES-256 encryption** using Python's `cryptography` library (`Fernet`)
 - [ ] Replace plain-text PIN storage with **bcrypt hashing**
 - [ ] Implement **salted hashing** to protect against rainbow table attacks
 - [ ] Secure key management — separating the encryption key from stored data
