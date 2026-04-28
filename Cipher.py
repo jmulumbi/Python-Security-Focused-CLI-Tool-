@@ -6,12 +6,14 @@
 # 4. Look for options for add on 
 # 5. Create a GUI which deals with the front-end 
 # 6. Database in the future 
+# 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #Import json, os, cryptography, and base64
 import json
 import os
 from cryptography.fernet import Fernet
 import base64
+import bcrypt
 #Function for Luhn algorithm to validate credit card numbers.
 def verify_credit_card(card_translated):
     total = 0 
@@ -31,33 +33,46 @@ def verify_credit_card(card_translated):
     total = sum_of_even_digits + sum_of_odd_digits
     print(total)
     return total % 10 == 0
+#Function to hash pin
+def hash_pin(pin):
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(pin.encode(),salt)
+    return hashed.decode('utf-8')
+#Function to verify hashed pin
+def verify_pin(input_pin, stored_hash):
+    return bcrypt.checkpw(input_pin.encode(), stored_hash.encode())
+#Function to load data from the json file 
+def load_data(file_name):
+    if not os.path.exists(file_name):
+        print('No Cards Saved Yet')
+        return None
+    with open(file_name) as f:
+        all_data = json.load(f)
+    return all_data
+def show_cards(all_data):
+    for i, card in enumerate(all_data):
+        print(f'{i+1}. {card['first_name']} {card['last_name']}')
 
 #Main function to run CLI Tool 
 def main():
     print("Welcome To Your Credit Card Storage and Encryption System")
     while True:
-        card_number = []
         print(f'Services\n \
         1.Add and encrypt card number\n \
         2.View Card  \n \
         3.Remove Credit Card Number\n \
-        4.View Cards')
+        4.View Cards \n \
+        5.Change Pin')
         choices = input('Please input the choice you want to make: ')
         if choices == '1':
             file_name = 'cards.json'
-            key_file_name = 'key.json'
+
             if os.path.exists(file_name):
                 with open(file_name) as f:
                     all_data = json.load(f)
             else:
                 all_data = []
             
-            if os.path.exists(key_file_name):
-                with open(key_file_name) as x:
-                    key_data = json.load(x)
-            else:
-                key_data = []
-
             name = input('What is your first name?: ')
             sname = input('What is your second name?: ')
     
@@ -79,46 +94,38 @@ def main():
                 if len(pin) != 4:
                     print(f'Your pin must be 4 digits')
                     continue
+                if not pin.isdigit():
+                    print('Pin must be a digit')
+                    continue
 
                 key = Fernet.generate_key()
                 y = Fernet(key)
-                token = y.encrypt(str(card_number).encode())  
-                print(f'{card_translated} becomes {token}')
+                token = y.encrypt(str(card_translated).encode())  
+ 
+                print(f'**** **** **** {card_translated[-4:]} has been saved')
 
                 all_data.append({
                 'first_name': name,
                 'last_name':sname, 
                 'card_number': base64.b64encode(token).decode('utf-8'),
-                'card_pin':pin
+                'card_pin':hash_pin(pin),
+                'key':base64.b64encode(key).decode('utf-8')
             })
-                key_data.append({
-                    'key':base64.b64encode(key).decode('utf-8')
-                })
+
                 with open(file_name,'w') as f:
                     json.dump(all_data,f,indent=2)
                 print(f"Card Saved! Total Card Entries: {len(all_data)}")
-                with open(key_file_name,'w') as x:
-                    json.dump(key_data,x,indent=2)
                 print(f'Key Saved')
+
             else:
                 print('Invalid!')
         elif choices == '2':
-            file_name = 'cards.json'
-            key_file_name = 'key.json'
-            if not os.path.exists(file_name) or not os.path.exists(key_file_name):
-                print('No Cards Saved Yet')
-                continue
-            with open(file_name) as f:
-                all_data = json.load(f)
-            with open(key_file_name) as x:
-                key_data = json.load(x)
+            all_data = load_data('cards.json')
             if not all_data:
                 print('No Cards Found')
                 continue
             print('Saved Cards \n')
-            for i, card in enumerate(all_data):
-                encrypted = base64.b64decode(card['card_number'])
-                print(f'{i+1}. {card['first_name']} {card['last_name']}')
+            show_cards(all_data)
             try:
                 pick = int(input('Select card number: ')) - 1
                 if pick < 0 or pick >= len(all_data):
@@ -128,11 +135,11 @@ def main():
                 print('Enter a number: ')
                 continue
             pin = input('Enter your pin: ')
-            if pin != all_data[pick]['card_pin']:
+            if not verify_pin(pin, all_data[pick]['card_pin']):
                 print('Incorrect Pin')
                 continue
 
-            key = base64.b64decode(key_data[pick]['key'])
+            key = base64.b64decode(all_data[pick]['key'])
             token = base64.b64decode(all_data[pick]['card_number'])
             f_key = Fernet(key)
             decrypted = f_key.decrypt(token).decode('utf-8')
@@ -140,19 +147,8 @@ def main():
                 
         elif choices == '3':
             file_name = 'cards.json'
-            key_file_name = 'key.json'
-
-            if not os.path.exists(file_name) or not os.path.exists(key_file_name):
-                print(f'There are no available cards')
-                continue
-            with open(file_name) as f:
-                all_data = json.load(f)
-            with open(key_file_name) as x:
-                key_data = json.load(x)
-
-            for i, card in enumerate(all_data):
-                print(f'{i+1}. {card['first_name']} {card['last_name']}')
-
+            all_data = load_data('cards.json')
+            show_cards(all_data)
             try: 
                 pick = int(input('Which card number do you want to remove?: ')) - 1
                 if pick < 0 or pick >= len(all_data):
@@ -160,33 +156,65 @@ def main():
             except:
                 print('Enter a number: ')
                 continue
-            pin = input(f'Please enter your pin for the account :')
-            #{card[pick]['first_name']} {card[pick]['last_name']}
-            if pin != all_data[pick]['card_pin']:
+            pin = input(f'Please enter your PIN for {all_data[pick]["first_name"]} {all_data[pick]["last_name"]}: ')
+            
+            if not verify_pin(pin,all_data[pick]['card_pin']):
                 print('Ivalid Pin')
                 continue
 
             remove = input('Are you sure you want to remove the card(y/n): ')
             if remove.lower() == 'y':
                 all_data.pop(pick)
-                key_data.pop(pick)
 
                 with open(file_name,'w') as f:
                     json.dump(all_data,f,indent=2)
 
-                with open(key_file_name,'w') as x:
-                    json.dump(key_data,x,indent=2)
 
                 print('Card Number Removed')
                 print(f'Card Number Removed. The total enttries are {len(all_data)}')
-                print(all_data)
-                print(key_data)
             else:
-                break
+                print('Removal Cancelled')
+                continue
         elif choices == '4':
-            pass
+            file_name = 'cards.json'
+
+            if not os.path.exists(file_name):
+                print('No available files ')
+                continue
+
+            all_data = load_data('cards.json')
+
+            show_cards(all_data)
+        elif choices == '5':
+            file_name = 'cards.json'
+            all_data = load_data('cards.json')
+            show_cards(all_data)
+            pick = int(input('Choose which card you want to change the pin of')) - 1 
+            if pick < 0 or pick > len(all_data):
+                print('Invalid Selection')
+                continue
+            pin = input(f'Please enter your current pin for {all_data[pick]['first_name']} {all_data[pick]['last_name']}: ')
+            if not verify_pin(pin,all_data[pick]['card_pin']):
+                print('Invalid Pin')
+                continue
+            else: 
+                new_pin = input(f'Please input your new pin for {all_data[pick]['first_name']} {all_data[pick]['last_name']}: ')
+                check_pin = input(f'Please enter the pin again to confirm change: ')
+                if new_pin != check_pin:
+                    print('Pins do not match. Try again')
+                    continue
+                else:
+                    all_data[pick]['card_pin'] = hash_pin(check_pin)
+                    with open(file_name,'w') as f:
+                        json.dump(all_data,f,indent=2)
+                        print('New Pin Saved')
         else:
             print('Invalid Choicce')
             continue
             
 main()
+
+#Valid Credit Cards:
+#Card Number: 1234123412361236 - Pin: 4566
+#Card Number: 4829173648291736 - Pin: 3201
+#Card Number: 6738492017463824 - Pin: 3532
