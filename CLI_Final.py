@@ -212,7 +212,7 @@ def main():
             print('Invalid Choicce')
             continue
             
-main()
+if __name__ == "__main__": main()
 
 #Valid Credit Cards:
 #Card Number: 1234123412361236 - Pin: 4566
