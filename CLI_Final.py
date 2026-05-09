@@ -16,6 +16,19 @@ import base64
 import bcrypt
 #Function for Luhn algorithm to validate credit card numbers.
 def verify_credit_card(card_translated):
+    """
+    Validate credit card number using the Luhn algorithm
+
+    Args:
+        card_translated (str): 16 digit card
+    
+    Returns:
+        bool: True if valid, False otherwise 
+
+    Example:
+         >>>> verify_credit_card("1234123412361236")
+        True
+    """
     total = 0 
     reversed_card = card_translated[::-1]
     sum_of_even_digits = 0
@@ -35,6 +48,19 @@ def verify_credit_card(card_translated):
     return total % 10 == 0
 #Function to hash pin
 def hash_pin(pin):
+    """
+    Hash pin using bcrypt library
+
+    Args:
+        pin (str): 4 digit pin number
+    
+    Returns:
+        str: hashed pin
+
+    Example:
+        >>>> hash_pin("1234")
+        -> "$2b$12$1I/WYsVsEPbMBEoD2jiZ.e1J7AQQKNkKnn2gk8F30gmDMr1ezoo6e"
+    """
     salt = bcrypt.gensalt()
     hashed = bcrypt.hashpw(pin.encode(),salt)
     return hashed.decode('utf-8')
@@ -92,15 +118,15 @@ def main():
 
                 pin = input('What is your pin: ')
                 if len(pin) != 4:
-                    print(f'Your pin must be 4 digits')
+                    print(f'Your PIN must be exactly 4 digits')
                     continue
                 if not pin.isdigit():
-                    print('Pin must be a digit')
+                    print('PIN must be a digit')
                     continue
 
                 key = Fernet.generate_key()
                 y = Fernet(key)
-                token = y.encrypt(str(card_translated).encode())  
+                token = y.encrypt(str(card_translated).encode()) 
  
                 print(f'**** **** **** {card_translated[-4:]} has been saved')
 
@@ -134,9 +160,9 @@ def main():
             except ValueError:
                 print('Enter a number: ')
                 continue
-            pin = input('Enter your pin: ')
+            pin = input('Enter your PIN: ')
             if not verify_pin(pin, all_data[pick]['card_pin']):
-                print('Incorrect Pin')
+                print('Incorrect PIN')
                 continue
 
             key = base64.b64decode(all_data[pick]['key'])
@@ -159,7 +185,7 @@ def main():
             pin = input(f'Please enter your PIN for {all_data[pick]["first_name"]} {all_data[pick]["last_name"]}: ')
             
             if not verify_pin(pin,all_data[pick]['card_pin']):
-                print('Ivalid Pin')
+                print('Invalid PIN')
                 continue
 
             remove = input('Are you sure you want to remove the card(y/n): ')
@@ -179,7 +205,7 @@ def main():
             file_name = 'cards.json'
 
             if not os.path.exists(file_name):
-                print('No available files ')
+                print('No available files')
                 continue
 
             all_data = load_data('cards.json')
@@ -189,27 +215,27 @@ def main():
             file_name = 'cards.json'
             all_data = load_data('cards.json')
             show_cards(all_data)
-            pick = int(input('Choose which card you want to change the pin of')) - 1 
+            pick = int(input('Choose which card you want to change the PIN of')) - 1 
             if pick < 0 or pick > len(all_data):
                 print('Invalid Selection')
                 continue
-            pin = input(f'Please enter your current pin for {all_data[pick]['first_name']} {all_data[pick]['last_name']}: ')
+            pin = input(f'Please enter your current PIN for {all_data[pick]['first_name']} {all_data[pick]['last_name']}: ')
             if not verify_pin(pin,all_data[pick]['card_pin']):
-                print('Invalid Pin')
+                print('Invalid PIN')
                 continue
             else: 
-                new_pin = input(f'Please input your new pin for {all_data[pick]['first_name']} {all_data[pick]['last_name']}: ')
+                new_pin = input(f'Please input your new PIN for {all_data[pick]['first_name']} {all_data[pick]['last_name']}: ')
                 check_pin = input(f'Please enter the pin again to confirm change: ')
                 if new_pin != check_pin:
-                    print('Pins do not match. Try again')
+                    print('PINs do not match. Try again')
                     continue
                 else:
                     all_data[pick]['card_pin'] = hash_pin(check_pin)
                     with open(file_name,'w') as f:
                         json.dump(all_data,f,indent=2)
-                        print('New Pin Saved')
+                        print('New PIN Saved')
         else:
-            print('Invalid Choicce')
+            print('Invalid Choice')
             continue
             
 if __name__ == "__main__": main()
