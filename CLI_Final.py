@@ -66,9 +66,42 @@ def hash_pin(pin):
     return hashed.decode('utf-8')
 #Function to verify hashed pin
 def verify_pin(input_pin, stored_hash):
+    """
+    Verify input pin is identical to the hashed pin
+
+    Args: 
+        input_pin (str) : 4 digit pin number
+        stored_hash (str) : 50 digit, symbol and letter long hash
+
+    Returns:
+        bool: True if Valid, False otherwise 
+    
+    Example:
+        >>>> verify_pin('1234',"$2b$12$1I/WYsVsEPbMBEoD2jiZ.e1J7AQQKNkKnn2gk8F30gmDMr1ezoo6e")
+        True
+    """
     return bcrypt.checkpw(input_pin.encode(), stored_hash.encode())
 #Function to load data from the json file 
 def load_data(file_name):
+    """
+    Load data from the cards.json file
+
+    Args:
+        file_name (.json file): JSON file with credentials
+
+    Returns:
+        Loaded JSON file
+
+    Example:
+        >>>> load_data('cards.json')
+          {
+    "first_name": "Jeremiah Mulumbi ",
+    "last_name": "2",
+    "card_number": "Z0FBQUFBQnAtbThIcEtoQ2dlb3NxZDRKa01hVXQza244VmFISXJVYnlvSnZKU2tLa2RsQnBEY0tCajVkbHQ2NV9iUkUwU3NrTGV6VDdiS0dKTEtIY19UR3o2aDIzMWZja1htYUwxYjg3SlpqY2tJQThmYWtYZlU9",
+    "card_pin": "$2b$12$1I/WYsVsEPbMBEoD2jiZ.e1J7AQQKNkKnn2gk8F30gmDMr1ezoo6e",
+    "key": "MmhDYzFLcGpSQVFRdDctS2Mtb1hXZUhmWEZsT0I5bTRpNmxDVmtNdGlITT0="
+  }
+    """
     if not os.path.exists(file_name):
         print('No Cards Saved Yet')
         return None
@@ -81,6 +114,9 @@ def show_cards(all_data):
 
 #Main function to run CLI Tool 
 def main():
+    """
+    Runs the main functionality of the CLI tool 
+    """
     print("Welcome To Your Credit Card Storage and Encryption System")
     while True:
         print(f'Services\n \
