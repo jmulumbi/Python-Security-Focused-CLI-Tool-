@@ -14,6 +14,10 @@ import os
 from cryptography.fernet import Fernet
 import base64
 import bcrypt
+PIN_LENGTH = 4 
+CARD_LENGTH = 16 
+CARDS_FILE = 'cards.json'
+MAX_PIN_ATTEMPTS = 3
 #Function for Luhn algorithm to validate credit card numbers.
 def verify_credit_card(card_translated):
     """
@@ -141,7 +145,7 @@ def main():
             translated = str.maketrans({' ':'','-':''})
             card_translated = card_number.translate(translated)
 
-            if len(card_translated) != 16:
+            if len(card_translated) != CARD_LENGTH:
                 print(f'❌Your card number input length was {len(card_translated)}. Card number must be 16 digits')
                 continue
             if not card_translated.isdigit():
@@ -152,7 +156,7 @@ def main():
                 print('✅Valid! Credit Card')
 
                 pin = input('What is your pin: ')
-                if len(pin) != 4:
+                if len(pin) != PIN_LENGTH:
                     print(f'❌Your PIN must be exactly 4 digits')
                     continue
                 if not pin.isdigit():
@@ -247,6 +251,7 @@ def main():
 
             show_cards(all_data)
         elif choices == '5':
+            #ADD CHECK TO SEE IF PIN IS 4 DIGITS
             file_name = 'cards.json'
             all_data = load_data('cards.json')
             show_cards(all_data)
